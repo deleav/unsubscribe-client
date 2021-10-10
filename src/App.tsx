@@ -1,14 +1,14 @@
 import { useState } from "react";
 import styled from "styled-components";
-import "./App.css";
-import Modal from "./modules/modal/Modal";
+import "antd/dist/antd.css";
+import { Modal } from "antd";
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
 
   return (
-    <div className="App">
-      <div id="main-content" className="App-header">
+    <Main>
+      <div id="main-content">
         <h1>Subscription info</h1>
         <table id="info" cellSpacing="24">
           <thead>
@@ -24,17 +24,22 @@ function App() {
       <FloatingFooter>
         <PlusButton onClick={() => setOpenModal(true)} />
       </FloatingFooter>
-      {openModal && (
-        <Modal onClose={() => setOpenModal(false)}>
-          <Link href="https://www.netflix.com/BillingActivity">Netflix</Link>
-        </Modal>
-      )}
-    </div>
+      <Modal
+        visible={openModal}
+        footer={null}
+        onCancel={() => setOpenModal(false)}
+      >
+        <Link href="https://www.netflix.com/BillingActivity">Netflix</Link>
+      </Modal>
+    </Main>
   );
 }
 
 export default App;
 
+const Main = styled.div`
+  padding: 40px;
+`;
 const FloatingFooter = styled.div`
   position: fixed;
   bottom: 0;
@@ -72,11 +77,11 @@ const PlusButton = styled.div`
   }
 `;
 const Link = styled.a`
+  display: block;
   padding: 16px;
-  width: 100%;
+  width: 80%;
   text-decoration: none;
   color: black;
-  border-radius: 8px;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.15);
