@@ -1,25 +1,61 @@
 import { useState } from "react";
 import styled from "styled-components";
 import "antd/dist/antd.css";
-import { Modal } from "antd";
+import { Modal, Table } from "antd";
+import { ListItem } from "./modules/List/types";
+import { ColumnsType } from "antd/lib/table";
+import HyperLink from "./modules/common/HyperLink";
+
+interface TargetSite {
+  name: string;
+  url: string;
+}
+
+const columns: ColumnsType<ListItem> = [
+  {
+    title: "Service Name",
+    dataIndex: "name",
+  },
+  {
+    title: "Expired Date",
+    dataIndex: "rechargeDate",
+  },
+  {
+    title: "Subscription Info Page",
+    dataIndex: "link",
+    render(value) {
+      return <HyperLink href={value}>Go to page</HyperLink>;
+    },
+  },
+];
 
 function App() {
   const [openModal, setOpenModal] = useState(false);
+  const [dataSource, setDataSource] = useState<ListItem[]>([]);
+  const [targetSites, setTargetSites] = useState<TargetSite[]>([]);
+
+  document.addEventListener(
+    "filldatafromextension",
+    function (
+      e: Event & {
+        readonly detail?: { data?: ListItem[]; targetSites?: TargetSite[] };
+      }
+    ) {
+      console.log(e.detail);
+
+      if (e.detail) {
+        const detail = e.detail;
+        if (detail.data?.length) setDataSource(detail.data);
+        if (detail.targetSites?.length) setTargetSites(detail.targetSites);
+      }
+    }
+  );
 
   return (
     <Main>
       <div id="main-content">
         <h1>Subscription info</h1>
-        <table id="info" cellSpacing="24">
-          <thead>
-            <tr>
-              <td>Service Name</td>
-              <td>Expired Date</td>
-              <td>Subscription Info Page</td>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+        <Table dataSource={dataSource} columns={columns} />
       </div>
       <FloatingFooter>
         <PlusButton onClick={() => setOpenModal(true)} />
@@ -29,7 +65,11 @@ function App() {
         footer={null}
         onCancel={() => setOpenModal(false)}
       >
-        <Link href="https://www.netflix.com/BillingActivity">Netflix</Link>
+        {targetSites.map((site) => (
+          <HyperLink href={site.url}>
+            <Option>{site.name}</Option>
+          </HyperLink>
+        ))}
       </Modal>
     </Main>
   );
@@ -76,7 +116,7 @@ const PlusButton = styled.div`
     background-color: white;
   }
 `;
-const Link = styled.a`
+const Option = styled.div`
   display: block;
   padding: 16px;
   width: 80%;
